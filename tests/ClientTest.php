@@ -111,3 +111,15 @@ it('sends private messages to one or more receivers', function () {
     $this->irc->privmsg(['#foobar'], 'Hello, World!');
     $this->irc->privmsg(['#foo', '&bar'], 'Hello, World!');
 });
+
+it('sends ping/pong messages', function () {
+    $this->client->expects(exactly(2))
+        ->method('send')
+        ->withConsecutive(
+            ["PING test\r\n"],
+            ["PONG test\r\n"],
+        );
+
+    $this->irc->ping('test');
+    $this->irc->pong('test');
+});

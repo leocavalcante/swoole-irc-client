@@ -62,6 +62,16 @@ class Client
         $this->send(new Message\PrivateMsg($receivers, $text));
     }
 
+    public function ping(string $server)
+    {
+        $this->send(new Message\Ping($server));
+    }
+
+    public function pong(string $daemon)
+    {
+        $this->send(new Message\Pong($daemon));
+    }
+
     public function send(MessageInterface $message)
     {
         $this->writeln($message->toString());
