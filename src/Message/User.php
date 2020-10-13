@@ -4,7 +4,7 @@ namespace SwooleIrc\Message;
 
 use SwooleIrc\MessageInterface;
 
-class User implements MessageInterface
+final class User implements MessageInterface
 {
     private string $username;
     private string $hostname;
