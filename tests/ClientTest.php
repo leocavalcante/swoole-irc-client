@@ -30,3 +30,11 @@ it('sends password message', function () {
 
     $this->irc->pass('test');
 });
+
+it('sends nick message', function () {
+    $this->client->expects($this->once())
+        ->method('send')
+        ->with("NICK test\r\n");
+
+    $this->irc->nick('test');
+});

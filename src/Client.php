@@ -27,6 +27,11 @@ class Client
         $this->send(new Message\Password($password));
     }
 
+    public function nick(string $nickname)
+    {
+        $this->send(new Message\Nick($nickname));
+    }
+
     protected function send(MessageInterface $message)
     {
         $this->client->send($message->toString() . MessageInterface::CRLF);
