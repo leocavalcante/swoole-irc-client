@@ -46,3 +46,11 @@ it('sends user message', function () {
 
     $this->irc->user('guest', 'tolmoon', 'tolsun', 'Ronnie Reagan');
 });
+
+it('sends operator message', function () {
+    $this->client->expects($this->once())
+        ->method('send')
+        ->with("OPER foo bar\r\n");
+
+    $this->irc->oper('foo', 'bar');
+});

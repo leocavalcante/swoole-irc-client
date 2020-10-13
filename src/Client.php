@@ -37,6 +37,11 @@ class Client
         $this->send(new Message\User($username, $hostname, $servername, $realName));
     }
 
+    public function oper(string $user, string $password)
+    {
+        $this->send(new Message\Operator($user, $password));
+    }
+
     protected function send(MessageInterface $message)
     {
         $this->client->send($message->toString() . MessageInterface::CRLF);
