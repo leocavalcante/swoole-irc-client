@@ -21,3 +21,8 @@ $irc->connect($host, $port);
 ```php
 $irc->pass($password);
 ```
+
+#### NICK
+```php
+$irc->nick($nickname);
+```
