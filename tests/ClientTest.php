@@ -54,3 +54,11 @@ it('sends operator message', function () {
 
     $this->irc->oper('foo', 'bar');
 });
+
+it('sends quit message', function () {
+    $this->client->expects($this->once())
+        ->method('send')
+        ->with("QUIT\r\n");
+
+    $this->irc->quit();
+});

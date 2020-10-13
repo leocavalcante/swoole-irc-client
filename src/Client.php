@@ -42,6 +42,11 @@ class Client
         $this->send(new Message\Operator($user, $password));
     }
 
+    public function quit()
+    {
+        $this->send(new Message\Quit());
+    }
+
     protected function send(MessageInterface $message)
     {
         $this->client->send($message->toString() . MessageInterface::CRLF);
