@@ -47,8 +47,13 @@ class Client
         $this->send(new Message\Quit());
     }
 
-    protected function send(MessageInterface $message)
+    public function send(MessageInterface $message)
     {
-        $this->client->send($message->toString() . MessageInterface::CRLF);
+        $this->writeln($message->toString());
+    }
+
+    public function writeln(string $message)
+    {
+        $this->client->send($message . MessageInterface::CRLF);
     }
 }
