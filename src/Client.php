@@ -32,6 +32,11 @@ class Client
         $this->send(new Message\Nick($nickname));
     }
 
+    public function user(string $username, string $hostname, string $servername, string $realName)
+    {
+        $this->send(new Message\User($username, $hostname, $servername, $realName));
+    }
+
     protected function send(MessageInterface $message)
     {
         $this->client->send($message->toString() . MessageInterface::CRLF);

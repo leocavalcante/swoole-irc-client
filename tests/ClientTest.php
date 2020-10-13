@@ -38,3 +38,11 @@ it('sends nick message', function () {
 
     $this->irc->nick('test');
 });
+
+it('sends user message', function () {
+    $this->client->expects($this->once())
+        ->method('send')
+        ->with("USER guest tolmoon tolsun :Ronnie Reagan\r\n");
+
+    $this->irc->user('guest', 'tolmoon', 'tolsun', 'Ronnie Reagan');
+});

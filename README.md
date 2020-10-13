@@ -26,3 +26,8 @@ $irc->pass($password);
 ```php
 $irc->nick($nickname);
 ```
+
+#### USER
+```php
+$irc->user($username, $hostname, $servername, $realName);
+```
