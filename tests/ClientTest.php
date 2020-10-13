@@ -4,6 +4,7 @@ namespace SwooleIrc\Test;
 
 use Swoole\Coroutine;
 use SwooleIrc\Client;
+use function PHPUnit\Framework\exactly;
 
 beforeEach(function () {
     $this->client = $this->getMockBuilder(Coroutine\Client::class)
@@ -61,4 +62,28 @@ it('sends quit message', function () {
         ->with("QUIT\r\n");
 
     $this->irc->quit();
+});
+
+it('joins one or more channels', function () {
+    $this->client->expects(exactly(2))
+        ->method('send')
+        ->withConsecutive(
+            ["JOIN #foobar\r\n"],
+            ["JOIN #foo,&bar\r\n"],
+        );
+
+    $this->irc->join(['#foobar']);
+    $this->irc->join(['#foo', '&bar']);
+});
+
+it('joins one or more channels wtih keys', function () {
+    $this->client->expects(exactly(2))
+        ->method('send')
+        ->withConsecutive(
+            ["JOIN #foo,&bar fubar\r\n"],
+            ["JOIN #foo,#bar fubar,foobar\r\n"],
+        );
+
+    $this->irc->join(['#foo', '&bar'], ['fubar']);
+    $this->irc->join(['#foo', '#bar'], ['fubar', 'foobar']);
 });
