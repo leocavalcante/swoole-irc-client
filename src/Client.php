@@ -57,6 +57,11 @@ class Client
         $this->send(new Message\Part($channels));
     }
 
+    public function privmsg(array $receivers, string $text)
+    {
+        $this->send(new Message\PrivateMsg($receivers, $text));
+    }
+
     public function send(MessageInterface $message)
     {
         $this->writeln($message->toString());

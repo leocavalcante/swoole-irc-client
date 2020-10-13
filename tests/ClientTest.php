@@ -99,3 +99,15 @@ it('leaves one or more channels', function () {
     $this->irc->part(['#foobar']);
     $this->irc->part(['#foo', '&bar']);
 });
+
+it('sends private messages to one or more receivers', function () {
+    $this->client->expects(exactly(2))
+        ->method('send')
+        ->withConsecutive(
+            ["PRIVMSG #foobar :Hello, World!\r\n"],
+            ["PRIVMSG #foo,&bar :Hello, World!\r\n"],
+        );
+
+    $this->irc->privmsg(['#foobar'], 'Hello, World!');
+    $this->irc->privmsg(['#foo', '&bar'], 'Hello, World!');
+});
