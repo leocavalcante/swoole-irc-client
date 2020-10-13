@@ -1,0 +1,32 @@
+{
+    "name": "leocavalcante/swoole-irc-client",
+    "description": "Swoole based IRC (Internet Relay Chat) Client",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "leocavalcante",
+            "email": "lc@leocavalcante.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "test": "pest"
+    },
+    "require": {
+        "php": ">=7.4",
+        "ext-swoole": "^4.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "SwooleIrc\\": "src/",
+            "SwooleIrc\\Test\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "swoole/ide-helper": "^4.5",
+        "phpunit/phpunit": "^9.4",
+        "pestphp/pest": "^0.3.9"
+    }
+}

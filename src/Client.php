@@ -1,0 +1,34 @@
+<?php declare(strict_types=1);
+
+namespace SwooleIrc;
+
+use Swoole\Coroutine;
+use SwooleIrc\Exception;
+use SwooleIrc\Message;
+
+class Client
+{
+    private Coroutine\Client $client;
+
+    public function __construct(?Coroutine\Client $client = null)
+    {
+        $this->client = $client ?? new Coroutine\Client(SWOOLE_SOCK_TCP);
+    }
+
+    public function connect(string $host, int $port): void
+    {
+        if (!$this->client->connect($host, $port)) {
+            throw new Exception\ConnectException($this->client->errMsg);
+        }
+    }
+
+    public function pass(string $password)
+    {
+        $this->send(new Message\Password($password));
+    }
+
+    protected function send(MessageInterface $message)
+    {
+        $this->client->send($message->toString() . MessageInterface::CRLF);
+    }
+}
