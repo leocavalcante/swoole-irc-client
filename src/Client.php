@@ -52,6 +52,11 @@ class Client
         $this->send(new Message\Join($channels, $keys));
     }
 
+    public function part(array $channels)
+    {
+        $this->send(new Message\Part($channels));
+    }
+
     public function send(MessageInterface $message)
     {
         $this->writeln($message->toString());

@@ -87,3 +87,15 @@ it('joins one or more channels wtih keys', function () {
     $this->irc->join(['#foo', '&bar'], ['fubar']);
     $this->irc->join(['#foo', '#bar'], ['fubar', 'foobar']);
 });
+
+it('leaves one or more channels', function () {
+    $this->client->expects(exactly(2))
+        ->method('send')
+        ->withConsecutive(
+            ["PART #foobar\r\n"],
+            ["PART #foo,&bar\r\n"],
+        );
+
+    $this->irc->part(['#foobar']);
+    $this->irc->part(['#foo', '&bar']);
+});
