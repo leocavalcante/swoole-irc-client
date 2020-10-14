@@ -27,7 +27,23 @@ $irc->pass($password);
 $irc->nick($nickname);
 ```
 
-#### USER
+#### JOIN
 ```php
-$irc->user($username, $hostname, $servername, $realName);
+$irc->join([$channel]);
+$irc->join([$channel], [$key]);
 ```
+
+#### PART
+```php
+$irc->part([$channel]);
+```
+
+#### PRIVMSG
+```php
+$irc->privmsg([$channel], $text);
+```
+
+Please, for now, take a look at the source code to see all supported commands.
+
+And you can always implement `MessageInterface` to send your own messages thought `$irc->send(MessageInterface $message)`
+or send raw lines with `$irc->writeln(string $raw)`.

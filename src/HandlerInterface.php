@@ -2,7 +2,8 @@
 
 namespace SwooleIrc;
 
-interface ReplyHandlerInterface
+interface HandlerInterface
 {
+    public function onConnect(Client $client): void;
     public function onReply(Reply $reply, Client $client): void;
 }

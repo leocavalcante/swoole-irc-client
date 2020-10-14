@@ -11,15 +11,21 @@ class Client
 {
     private Coroutine\Client $client;
     private LoggerInterface $logger;
+    private HandlerInterface $handler;
+
+    public function __construct(Coroutine\Client $client)
+    {
+        $this->client = $client;
+    }
 
     public static function create(): self
     {
         return new self(new Coroutine\Client(SWOOLE_SOCK_TCP));
     }
 
-    public function __construct(Coroutine\Client $client)
+    public static function withHandler(HandlerInterface $handler): self
     {
-        $this->client = $client;
+        return self::create()->handler($handler);
     }
 
     public function connect(string $host, int $port, bool $ssl = true): self
@@ -36,31 +42,55 @@ class Client
             $this->logger->info("Connected to $host at port $port");
         }
 
+        if (isset($this->handler)) {
+            $this->handler->onConnect($this);
+        }
+
         return $this;
     }
 
-    public function listen(ReplyHandlerInterface $handler): self
+    public function start(): void
     {
-        go(function () use ($handler) {
-           while ($this->client->connected) {
-               if ($buffer = $this->client->recv(30)) {
-                   foreach (explode("\r\n", $buffer) as $message) {
-                       $message = trim($message);
+        go(function () {
+            while ($this->client->connected) {
+                if ($buffer = $this->client->recv(30)) {
+                    foreach (explode(MessageInterface::CRLF, $buffer) as $message) {
+                        $message = trim($message);
 
-                       if (empty($message)) {
-                           continue;
-                       }
+                        if (empty($message)) {
+                            continue;
+                        }
 
-                       if (isset($this->logger)) {
-                           $this->logger->debug($message);
-                       }
+                        if (isset($this->logger)) {
+                            $this->logger->debug($message);
+                        }
 
-                       preg_match('#^(?::(\S+)\s+)?(\S+)\s+([^:]+)?(:\s*(.+))?$#', $message,$matches);
-                       $handler->onReply(Reply::createFromMatches($matches), $this);
-                   }
-               }
-           }
+                        $this->handleMessage($message);
+                    }
+                }
+            }
         });
+    }
+
+    public function handleMessage(string $message): void
+    {
+        if (strpos($message, 'PING') === 0) {
+            $this->writeln(str_replace('PING', 'PONG', $message));
+        }
+
+        if (isset($this->handler)) {
+            preg_match('#^(?::(\S+)\s+)?(\S+)\s+([^:]+)?(:\s*(.+))?$#', $message, $matches);
+            go(fn() => $this->handler->onReply(Reply::createFromMatches($matches), $this));
+        }
+    }
+
+    public function handler(HandlerInterface $handler): self
+    {
+        $this->handler = $handler;
+
+        if ($this->client->connected) {
+            $this->handler->onConnect($this);
+        }
 
         return $this;
     }
@@ -71,67 +101,77 @@ class Client
         return $this;
     }
 
+    public function send(MessageInterface $message): self
+    {
+        $this->writeln($message->toString());
+        return $this;
+    }
+
+    public function writeln(string $message): self
+    {
+        if (isset($this->logger)) {
+            $this->logger->debug($message);
+        }
+
+        $this->client->send($message . MessageInterface::CRLF);
+        return $this;
+    }
+
     public function nick(string $nickname): self
     {
         $this->send(new Message\Nick($nickname));
         return $this;
     }
 
-    public function user(string $username, string $hostname, string $servername, string $realName)
+    public function user(string $username, string $hostname, string $servername, string $realName): self
     {
         $this->send(new Message\User($username, $hostname, $servername, $realName));
+        return $this;
     }
 
-    public function oper(string $user, string $password)
+    public function oper(string $user, string $password): self
     {
         $this->send(new Message\Operator($user, $password));
+        return $this;
     }
 
-    public function quit()
+    public function quit(): self
     {
         $this->send(new Message\Quit());
+        return $this;
     }
 
-    public function join(array $channels, array $keys = [])
+    public function join(array $channels, array $keys = []): self
     {
         $this->send(new Message\Join($channels, $keys));
+        return $this;
     }
 
-    public function part(array $channels)
+    public function part(array $channels): self
     {
         $this->send(new Message\Part($channels));
+        return $this;
     }
 
-    public function privmsg(array $receivers, string $text)
+    public function privmsg(array $receivers, string $text): self
     {
         $this->send(new Message\PrivateMsg($receivers, $text));
+        return $this;
     }
 
-    public function ping(string $server)
+    public function ping(string $server): self
     {
         $this->send(new Message\Ping($server));
+        return $this;
     }
 
-    public function pong(string $daemon)
+    public function pong(string $daemon): self
     {
         $this->send(new Message\Pong($daemon));
+        return $this;
     }
 
-    public function send(MessageInterface $message)
-    {
-        $this->writeln($message->toString());
-    }
-
-    public function writeln(string $message)
-    {
-        if (isset($this->logger)) {
-            $this->logger->debug($message);
-        }
-
-        $this->client->send("$message\r\n");
-    }
-
-    public function setLogger(LoggerInterface $logger): self
+    public function logger(LoggerInterface $logger): self
     {
         $this->logger = $logger;
         return $this;
