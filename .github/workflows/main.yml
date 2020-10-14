@@ -17,6 +17,7 @@ jobs:
         php-version: '7.4'
         tools: pecl
         extensions: swoole
+        coverage: none
 
     - name: Validate composer.json and composer.lock
       run: composer validate
