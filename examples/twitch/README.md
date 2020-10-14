@@ -36,7 +36,7 @@ Co\run(static function (): void {
     $logger = new Logger('BipBop');
     $logger->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
 
-    Client::withHandler(new BipBopMyBot(getenv('TWITCH_OAUTH_TOKEN')))
+    Client::withHandler(new BipBopBot(getenv('TWITCH_OAUTH_TOKEN')))
         ->logger($logger)
         ->connect('irc.chat.twitch.tv', 6667, false)
         ->start();

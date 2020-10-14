@@ -138,6 +138,7 @@ class Client
     public function quit(): self
     {
         $this->send(new Message\Quit());
+        $this->client->close();
         return $this;
     }
 

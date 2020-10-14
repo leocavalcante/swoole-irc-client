@@ -9,7 +9,7 @@ use SwooleIrc\HandlerInterface;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-class BipBopMyBot implements HandlerInterface
+class BipBopBot implements HandlerInterface
 {
     private string $twOauthToken;
 
@@ -38,10 +38,10 @@ class BipBopMyBot implements HandlerInterface
 }
 
 Co\run(static function (): void {
-    $logger = new Logger('BipBop');
+    $logger = new Logger('BipBopBot');
     $logger->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
 
-    Client::withHandler(new BipBopMyBot(getenv('TWITCH_OAUTH_TOKEN')))
+    Client::withHandler(new BipBopBot(getenv('TWITCH_OAUTH_TOKEN')))
         ->logger($logger)
         ->connect('irc.chat.twitch.tv', 6667, false)
         ->start();

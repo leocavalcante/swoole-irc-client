@@ -61,6 +61,9 @@ it('sends quit message', function () {
         ->method('send')
         ->with("QUIT\r\n");
 
+    $this->client->expects($this->once())
+        ->method('close');
+
     $this->irc->quit();
 });
 
