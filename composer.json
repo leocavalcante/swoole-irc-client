@@ -16,7 +16,8 @@
     },
     "require": {
         "php": ">=7.4",
-        "ext-swoole": "^4.5"
+        "ext-swoole": "^4.5",
+        "monolog/monolog": "^2.1"
     },
     "autoload": {
         "psr-4": {

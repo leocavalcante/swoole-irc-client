@@ -2,6 +2,7 @@
 
 namespace SwooleIrc;
 
+use Psr\Log\LoggerInterface;
 use Swoole\Coroutine;
 use SwooleIrc\Exception;
 use SwooleIrc\Message;
@@ -9,27 +10,71 @@ use SwooleIrc\Message;
 class Client
 {
     private Coroutine\Client $client;
+    private LoggerInterface $logger;
 
-    public function __construct(?Coroutine\Client $client = null)
+    public static function create(): self
     {
-        $this->client = $client ?? new Coroutine\Client(SWOOLE_SOCK_TCP);
+        return new self(new Coroutine\Client(SWOOLE_SOCK_TCP));
     }
 
-    public function connect(string $host, int $port): void
+    public function __construct(Coroutine\Client $client)
     {
+        $this->client = $client;
+    }
+
+    public function connect(string $host, int $port, bool $ssl = true): self
+    {
+        if ($ssl) {
+            $this->client->enableSSL();
+        }
+
         if (!$this->client->connect($host, $port)) {
             throw new Exception\ConnectException($this->client->errMsg);
         }
+
+        if (isset($this->logger)) {
+            $this->logger->info("Connected to $host at port $port");
+        }
+
+        return $this;
     }
 
-    public function pass(string $password)
+    public function listen(ReplyHandlerInterface $handler): self
+    {
+        go(function () use ($handler) {
+           while ($this->client->connected) {
+               if ($buffer = $this->client->recv(30)) {
+                   foreach (explode("\r\n", $buffer) as $message) {
+                       $message = trim($message);
+
+                       if (empty($message)) {
+                           continue;
+                       }
+
+                       if (isset($this->logger)) {
+                           $this->logger->debug($message);
+                       }
+
+                       preg_match('#^(?::(\S+)\s+)?(\S+)\s+([^:]+)?(:\s*(.+))?$#', $message,$matches);
+                       $handler->onReply(Reply::createFromMatches($matches), $this);
+                   }
+               }
+           }
+        });
+
+        return $this;
+    }
+
+    public function pass(string $password): self
     {
         $this->send(new Message\Password($password));
+        return $this;
     }
 
-    public function nick(string $nickname)
+    public function nick(string $nickname): self
     {
         $this->send(new Message\Nick($nickname));
+        return $this;
     }
 
     public function user(string $username, string $hostname, string $servername, string $realName)
@@ -79,6 +124,16 @@ class Client
 
     public function writeln(string $message)
     {
-        $this->client->send($message . MessageInterface::CRLF);
+        if (isset($this->logger)) {
+            $this->logger->debug($message);
+        }
+
+        $this->client->send("$message\r\n");
+    }
+
+    public function setLogger(LoggerInterface $logger): self
+    {
+        $this->logger = $logger;
+        return $this;
     }
 }
