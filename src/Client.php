@@ -79,8 +79,7 @@ class Client
         }
 
         if (isset($this->handler)) {
-            preg_match('#^(?::(\S+)\s+)?(\S+)\s+([^:]+)?(:\s*(.+))?$#', $message, $matches);
-            go(fn() => $this->handler->onReply(Reply::createFromMatches($matches), $this));
+            go(fn() => $this->handler->onReply(Reply::parse($message), $this));
         }
     }
 
