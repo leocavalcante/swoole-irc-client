@@ -21,33 +21,49 @@ $irc->connect($host, $port);
 $irc->start();
 ```
 
-### Commands
+### CallbackHandler
 
-#### PASS
+This library provides a convenient way to pass a regular callable as well if you don't want to create a class and implement an interface.
+
+```php
+use SwooleIrc\{Reply, Client, CallbackHandler};
+
+$handler = static function (Reply $reply): void {};
+
+$irc = Client::withHandler(CallbackHandler::reply($handler))
+    ->connect($host, $port)
+    ->start();
+```
+
+## Commands
+
+### PASS
 ```php
 $irc->pass($password);
 ```
 
-#### NICK
+### NICK
 ```php
 $irc->nick($nickname);
 ```
 
-#### JOIN
+### JOIN
 ```php
 $irc->join([$channel]);
 $irc->join([$channel], [$key]);
 ```
 
-#### PART
+### PART
 ```php
 $irc->part([$channel]);
 ```
 
-#### PRIVMSG
+### PRIVMSG
 ```php
 $irc->privmsg([$channel], $text);
 ```
+
+---
 
 Please, for now, take a look at the source code to see all supported commands.
 
