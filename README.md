@@ -35,6 +35,10 @@ $irc = Client::withHandler(CallbackHandler::reply($handler))
     ->start();
 ```
 
+#### Examples
+- [Twitch.tv Chatbot](https://github.com/leocavalcante/swoole-irc-client/tree/main/examples/twitch)
+- [Freenode Chat CLI Client](https://github.com/leocavalcante/swoole-irc-client/tree/main/examples/freenode)
+
 ## Commands
 
 ### PASS
