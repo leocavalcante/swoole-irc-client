@@ -9,10 +9,16 @@ composer require leocavalcante/swoole-irc-client
 
 ## Usage
 ```php
-use SwooleIrc\Client;
+use SwooleIrc\{HandlerInterface, Reply, Client};
 
-$irc = new Client();
+class MyHandler implements HandlerInterface {
+    public function onConnect(Client $irc): void {}
+    public function onReply(Reply $reply, Client $irc): void {}
+}
+
+$irc = Client::withHandler(new MyHandler());
 $irc->connect($host, $port);
+$irc->start();
 ```
 
 ### Commands
