@@ -21,7 +21,7 @@ it('connects to an irc server', function() {
         ->willReturn(true);
 
 
-    $this->irc->connect('test', 1234);
+    $this->irc->connect('test', 1234, false);
 });
 
 it('sends password message', function () {
